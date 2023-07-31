@@ -1,6 +1,8 @@
+import { MouseEventHandler } from "react";
+
 type ChoicesProps = {
     choices: string[],
-    onClick: Function
+    onClick: MouseEventHandler
 }
 export default function Choices(props: ChoicesProps) {
   const { choices, onClick } = props;
