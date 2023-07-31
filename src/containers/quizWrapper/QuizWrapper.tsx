@@ -6,12 +6,16 @@ import Choices from "@/components/choices/Choices"
 import Feedback from "@/components/feedback/Feedback"
 import Question from "@/components/question/Question"
 
-export default function QuizWrapper({ data }: { data: any }) {
+export default function QuizWrapper() {
+    const answerLanguage = 'en'
+    const subject = 'colors'
+    const questionLanguage = 'mi'
 
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [answered, setAnswered] = useState(0);
     const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
     const [choices, setChoices] = useState(['']);
+    const [data, setData] = useState<any>(null); // TODO: type this
     const [score, setScore] = useState(0);
     const [stemWord, setStemWord] = useState('');
     const [success, setSuccess] = useState<boolean | undefined>(undefined);
@@ -29,14 +33,27 @@ export default function QuizWrapper({ data }: { data: any }) {
         }
     }
 
+    const fetchDataHandler = () => {
+        fetch(`http://127.0.0.1:5000/api/get_question?answer_lang=${answerLanguage}&subject=${subject}&question_lang=${questionLanguage}`, {cache: "no-store"})
+            .then(res => res.json())
+            .then(data => {
+                setData(data)
+            }
+        )
+    }
+
     const handleChoiceClick = ({ target: { innerText } }: { target: { innerText: string } }) => {
         checkAnswer(innerText)
     }
 
     function handleNextClick() {
         setSuccess(undefined);
-        // fetchDataHandler();
+        fetchDataHandler();
     }
+
+    useEffect(() => {
+        fetchDataHandler();
+    }, [])
 
     useEffect(() => {
         calculateScore()
@@ -44,8 +61,6 @@ export default function QuizWrapper({ data }: { data: any }) {
 
     useEffect(() => {
         if(!data) return;
-
-        console.debug('data choices', data)
         setCorrectAnswer(data.answer);
         setChoices(data.options);
         setStemWord(data.question);
